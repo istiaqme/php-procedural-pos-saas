@@ -1,0 +1,181 @@
+<?php 
+  $FromCounter = $_GET["CounterToken"];
+  $FromCounterTitle = CounterTitle($FromCounter);
+?>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title><?php echo "$ModuleTitle"; ?></title>
+    <?php require(APP_ROOT.'/APP/VIEWS/INCLUDES/common.meta.php'); ?>
+  </head>
+  <body>
+    <!-- Begin page -->
+    <div id="wrapper">
+      <!-- Top Bar Start -->
+      <?php require(APP_ROOT.'/APP/VIEWS/INCLUDES/business.top.bar.php'); ?>
+      <!-- Top Bar End -->
+      <!-- ========== Left Sidebar Start ========== -->
+      <?php require(APP_ROOT.'/APP/VIEWS/INCLUDES/business.left.side.bar.php'); ?>
+      <!-- Left Sidebar End -->
+      <?php require(APP_ROOT.'/APP/VIEWS/INCLUDES/business.module.hidden.data.php'); ?>
+      <!-- ============================================================== -->
+      <!-- Start right Content here -->
+      <!-- ============================================================== -->
+      <div class="content-page">
+        <!-- Start content -->
+        <div class="content">
+          <div class="container-fluid">
+            <div class="row">
+              <!-- PAGE HEADER -->
+              <div class="col-12">
+                <div class="page-title-box">
+                  <h4 class="page-title">Sales By Date | <?php echo $CounterTitle; ?> | <?php echo BDDATE($ShowDate); ?></h4>
+                  <ol class="breadcrumb p-0 m-0">
+                    
+                  </ol>
+                  <div class="clearfix"></div>
+                </div>
+              </div>
+              <!-- PAGE HEADER -->
+
+              <!-- PAGE INFORMATION -->
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-body">
+                    <h4 class="m-t-0 header-title"><b>List</b></h4>
+                    <p class="text-muted m-b-20">
+                      Search Using The Search Box Below
+                    </p>
+                    <div class="form-group">
+                      <input type="text" id="SearchInTable" class="form-control">
+                    </div>
+                    <table class="table table-striped m-0" id="ShowPMLTable">
+                    	<thead class='bg-success text-white'>
+                        <tr>
+                          <td></td>
+                          <td></td>
+                          <td><button class='btn btn-danger waves-effect waves-light' id="TotalIndividualBox"></button></td>
+                          <td><button class='btn btn-danger waves-effect waves-light' id="TotalSingleProductPriceBox"></button></td>
+                          <td></td>
+                        </tr>
+                    		<tr>
+                          <th>SL</th>
+                    			<th>Product Title</th>
+                          <th>Total Units</th>
+                          <th>Total Sale Price</th>
+                    			<th>VIEW</th>
+                    		</tr>
+                    		<?php
+                          echo "<tbody>";
+													# GET PML OF THE DATE
+                          $Q = "SELECT  PMLToken, BDDT, ProductToken, COUNT(PMIID) AS TotalIndividuals, SUM(Price) AS TotalPrice FROM productmovementinsertion_details  WHERE BusinessToken = '$BusinessToken' AND FromCounter = '$CounterToken' AND PMLType = '3' AND WorkFlowStatus = '3' AND DATE(BDDT) = '$ShowDate' AND Existence = '1' GROUP BY ProductToken ";
+                          $RQ = RunQuery($Q);
+                          $SL = 1;
+                          while($RowQ = Fetch($RQ)){
+                            
+                            $PMLToken = $RowQ["PMLToken"];
+                            $TotalIndividuals = $RowQ["TotalIndividuals"];
+                            $ProductToken = $RowQ["ProductToken"];
+                            $TotalPrice = $RowQ["TotalPrice"];
+                            $ProductTitle = ProductTitle($ProductToken);
+                            $DBBDDT = $RowQ["BDDT"];
+                              echo "<tr>";
+                              echo "<td scope = 'row'>$SL</td>";
+                              echo "<td>$ProductTitle</td>";
+                              echo "<td><button class='SingleProductIndividuals btn btn-danger waves-effect waves-light'>$TotalIndividuals</button></td>";
+                              echo "<td><button class='SingleProductTotalPrice btn btn-danger waves-effect waves-light'>$TotalPrice</button></td>";
+                              echo "<td><a class='btn btn-success waves-effect waves-light' href = 'index.php?p=business&m=1045121&Date=$ShowDate&CounterToken=$CounterToken&PT=$ProductToken'>VIEW</a></td>";
+                              echo "</tr>";
+                              $SL++;
+                            
+                            
+                          }
+													
+                          
+													
+													echo "</tbody>";
+
+												?>
+                    	</thead>
+                      
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <!-- PAGE INFORMATION -->
+            </div>
+            <!-- end row -->
+            <div class="row">
+              <div class="col-sm-12">
+              </div>
+              <!-- end col -->
+            </div>
+            <!-- end row -->
+          </div>
+          <!-- container-fluid -->
+        </div>
+        <!-- content -->
+        <?php require(APP_ROOT.'/APP/VIEWS/INCLUDES/business.footer.php'); ?>
+      </div>
+      <!-- ============================================================== -->
+      <!-- End Right content here -->
+      <!-- ============================================================== -->
+    </div>
+    <!-- END wrapper -->
+
+    <script>
+      var resizefunc = [];
+    </script>
+    <?php require(APP_ROOT.'/APP/VIEWS/INCLUDES/common.scripts.php'); ?>
+    <script>
+
+      function TotalInvoicePriceSum(){
+        var sum = 0;
+        $('.SingleProductIndividuals').each(function()
+        {
+            sum += parseFloat($(this).text());
+        });
+        return sum;
+      }
+
+      function TotalInvoicePriceSum2(){
+        var sum = 0;
+        $('.SingleProductTotalPrice').each(function()
+        {
+            sum += parseFloat($(this).text());
+        });
+        return sum;
+      }
+
+
+      $(document).ready(function(){
+        var Total = TotalInvoicePriceSum();
+        $('#TotalIndividualBox').text(Total);
+        var TotalPrice = TotalInvoicePriceSum2();
+        $('#TotalSingleProductPriceBox').text(TotalPrice);
+
+        $("#SearchInTable").on("keyup", function() {
+            var value = $(this).val().toUpperCase();
+
+            $("#ShowPMLTable tr").each(function(index) {
+                if (index !== 0) {
+
+                    $row = $(this);
+
+                    var id = $row.text().toUpperCase();
+
+                    if (id.indexOf(value) !== -1) {
+                        $row.show();    
+                    }
+                    else {
+                        $row.hide();    
+                    }
+                }
+            });
+        });
+      });
+      
+    </script>
+  </body>
+</html>

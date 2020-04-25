@@ -1,0 +1,9 @@
+<input type="hidden" id="UserToken" value="<?php echo "$UserToken"; ?>">
+<input type="hidden" id="FirstName" value="<?php echo "$FirstName"; ?>">
+<input type="hidden" id="LastName" value="<?php echo "$LastName"; ?>">
+<input type="hidden" id="PhoneNumber" value="<?php echo "$PhoneNumber"; ?>">
+<input type="hidden" id="Rank" value="<?php echo "$Rank"; ?>">
+<input type="hidden" id="BusinessToken" value="<?php echo "$BusinessToken"; ?>">
+<input type="hidden" id="SubRank" value="<?php echo "$SubRank"; ?>">
+<input type="hidden" id="BusinessName" value="<?php echo "$BusinessName"; ?>">
+<input type="hidden" id="Warehouse" value="<?php echo "$Warehouse"; ?>">
